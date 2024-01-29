@@ -61,7 +61,7 @@ const bookSchema = new mongoose.Schema({
 });
 
 // 2. pass the plugin to the schema's plugin method
-bookSchema.plugin(plugin);
+bookSchema.plugin(findWithinReferencePlugin);
 
 const Book = mongoose.model("Book", bookSchema);
 
@@ -84,7 +84,7 @@ const authorSchema = new mongoose.Schema({
 });
 
 // 2. pass the plugin to the schema's plugin method
-authorSchema.plugin(plugin);
+authorSchema.plugin(findWithinReferencePlugin);
 
 const Author = mongoose.model("Author", authorSchema);
 ```
