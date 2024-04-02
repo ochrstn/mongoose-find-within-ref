@@ -57,6 +57,12 @@ export async function createExampleData({
     books: [book3, book4],
   }).save();
 
+  const author3 = await new Author({
+    name: "author3",
+    agent: agent1,
+    books: [],
+  }).save();
+
   return {
     publisher1,
     publisher2,
@@ -69,5 +75,6 @@ export async function createExampleData({
     agent2,
     author1,
     author2,
+    author3,
   };
 }

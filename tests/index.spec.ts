@@ -119,4 +119,36 @@ describe("MongooseFindWithinReference", () => {
       );
     });
   });
+
+  describe(`query with top-level $or operator`, () => {
+    it("should return the authors who have written book1 or book2", async () => {
+      await mongoose.connect(mongoUri);
+
+      const findWithinReferencePlugin = createMongooseFindWithinReferencePlugin(
+        {
+          isActiveByDefault: true,
+        }
+      );
+
+      const { Agent, Publisher, Book, Author } = createExampleSchema(
+        findWithinReferencePlugin
+      );
+
+      const data = await createExampleData({
+        Agent,
+        Publisher,
+        Book,
+        Author,
+      });
+
+      const result = await Author.find({
+        $or: [{ books: { title: "book1" } }, { books: { title: "book3" } }],
+      });
+
+      expect(result).toHaveLength(2);
+
+      expect(result[0]._id).toEqual(data.author1._id);
+      expect(result[1]._id).toEqual(data.author2._id);
+    });
+  });
 });
