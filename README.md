@@ -110,6 +110,8 @@ The [`createMongooseFindWithinReferencePlugin`](command:_github.copilot.openSymb
 
 - [`isActiveByDefault`](command:_github.copilot.openSymbolInFile?%5B%22src%2Findex.ts%22%2C%22isActiveByDefault%22%5D "src/index.ts"): A boolean that determines whether the plugin is active by default for all queries. If set to `false`, you can still activate the plugin for individual queries by setting the [`useFindWithinReference`](command:_github.copilot.openSymbolInFile?%5B%22src%2Findex.ts%22%2C%22useFindWithinReference%22%5D "src/index.ts") option to `true` in the query options.
 
+- [`middlewares`] By default the plugin will use the `pre` middleware to intercept the `find`, `findOne`, `distinct`, `count` and `countDocumets` methods. If you want to use a different middlewares, you can pass them as an array of strings (see [Mongoose middleware](https://mongoosejs.com/docs/middleware.html)).
+
 ## How It Works
 
 The plugin works by intercepting the `find` and `findOne` methods of your Mongoose models. When you perform a query, the plugin checks if the query includes any reference fields. If it does, the plugin modifies the query to perform a nested query within the referenced documents.
@@ -131,6 +133,8 @@ Please note that this is a simplified explanation. The actual process involves m
 While the plugin is a powerful tool for querying nested documents, there are some limitations to be aware of:
 
 Currently, if the reference field you want to query is nested within an `$or` or `$and` operator in your query, it will not be considered. This is a known limitation and we're actively working on a solution. For now, you'll need to structure your queries so that the reference fields are not nested within other operators.
+
+Using the dot notation to query nested fields in referenced documents is currently not supported. For example, you cannot query a nested field like `book.publisher.name` directly. Instead, you need to query the nested field as a nested object like in the example above`.
 
 ## Contributing
 
