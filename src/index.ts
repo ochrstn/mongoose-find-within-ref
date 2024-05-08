@@ -39,8 +39,19 @@ async function handleQueryKey(
 ) {
   const value = query[key];
 
+  // value is in dot syntax
+  const isDotSyntax: boolean = key.includes(".");
+
+  // if the key is in dot syntax, 1. get the first part of the key
+  const firstPartOfKey = isDotSyntax ? key.split(".")[0] : key;
+
+  // if the key is in dot syntax, get the remaining part of the key
+  const remainingPartOfKey = isDotSyntax
+    ? key.split(".").slice(1).join(".")
+    : "";
+
   // get the datatype of the field from the mongoose schema
-  const fieldSchema = schema.path(key);
+  const fieldSchema = schema.path(firstPartOfKey);
 
   // if the field exists in the schema
   if (fieldSchema) {
@@ -52,10 +63,13 @@ async function handleQueryKey(
         // check if we should handle this query (query operation is something that justifies a subquery)
         if (shouldWeHandleThis(value)) {
           // replace the inner query with the ids of the referenced documents, obtained through a subquery
-          query[key] = {
+          if (isDotSyntax) {
+            delete query[key];
+          }
+          query[isDotSyntax ? firstPartOfKey : key] = {
             $in: (
               await models[ref].find(
-                value,
+                isDotSyntax ? { [remainingPartOfKey]: value } : value,
                 { _id: 1 },
                 { useFindWithinReference: true }
               )
@@ -71,9 +85,12 @@ async function handleQueryKey(
       if (ref) {
         // check if we should handle this query (query operation is something that justifies a subquery)
         if (shouldWeHandleThis(value)) {
-          query[key] = (
+          if (isDotSyntax) {
+            delete query[key];
+          }
+          query[isDotSyntax ? firstPartOfKey : key] = (
             await models[ref].findOne(
-              value,
+              isDotSyntax ? { [remainingPartOfKey]: value } : value,
               { _id: 1 },
               { useFindWithinReference: true }
             )

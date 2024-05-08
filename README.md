@@ -134,8 +134,6 @@ While the plugin is a powerful tool for querying nested documents, there are som
 
 If the reference field you want to query is nested within another operator in your query, it will not be considered in every case. Currently only a top-level `$or` operator can be handled. This is a known limitation and we're actively working on a solution. For now, you'll need to structure your queries so that the reference fields are not nested within other operators.
 
-Using the dot notation to query nested fields in referenced documents is currently not supported. For example, you cannot query a nested field like `book.publisher.name` directly. Instead, you need to query the nested field as a nested object like in the example above`.
-
 ## Contributing
 
 We're always looking to improve, so if you encounter any issues or have suggestions for improvements, please feel free to open an issue or merge request.

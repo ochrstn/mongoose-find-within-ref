@@ -54,6 +54,36 @@ describe("MongooseFindWithinReference", () => {
       expect(authorsWithBestSeller[0]._id).toEqual(data.author2._id);
     });
 
+    it("should work using dot syntax", async () => {
+      const findWithinReferencePlugin = createMongooseFindWithinReferencePlugin(
+        {
+          isActiveByDefault: true,
+        }
+      );
+
+      const { Agent, Publisher, Book, Author } = createExampleSchema(
+        findWithinReferencePlugin
+      );
+
+      const data = await createExampleData({
+        Agent,
+        Publisher,
+        Book,
+        Author,
+      });
+
+      const authorsWithBestSeller = await Author.find({
+        books: {
+          isBestSeller: true,
+          "publisher.name": "Publisher 2",
+        },
+        "agent.name": "agent2",
+      });
+
+      expect(authorsWithBestSeller).toHaveLength(1);
+      expect(authorsWithBestSeller[0]._id).toEqual(data.author2._id);
+    });
+
     it("should work using per-query flag", async () => {
       await mongoose.connect(mongoUri);
 
