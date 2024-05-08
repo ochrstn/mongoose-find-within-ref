@@ -88,13 +88,19 @@ async function handleQueryKey(
           if (isDotSyntax) {
             delete query[key];
           }
-          query[isDotSyntax ? firstPartOfKey : key] = (
-            await models[ref].findOne(
-              isDotSyntax ? { [remainingPartOfKey]: value } : value,
-              { _id: 1 },
-              { useFindWithinReference: true }
-            )
-          )._id;
+
+          const foundDocument = await models[ref].findOne(
+            isDotSyntax ? { [remainingPartOfKey]: value } : value,
+            { _id: 1 },
+            { useFindWithinReference: true }
+          );
+
+          if (foundDocument) {
+            query[isDotSyntax ? firstPartOfKey : key] = foundDocument._id;
+          } else {
+            // rewrite the query so that it does not match anything
+            query[isDotSyntax ? firstPartOfKey : key] = { $in: [] };
+          }
         }
       }
     }
