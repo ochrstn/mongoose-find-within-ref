@@ -104,6 +104,18 @@ Author.find({
 });
 ```
 
+or using dot notation:
+
+```typescript
+Author.find({
+  books: {
+    isBestSeller: true,
+    "publisher.name": "Publisher 2",
+  },
+  "agent.name": "agent2", // the agents name field is a property of the referenced Agent document inside the Author document
+});
+```
+
 ### Options
 
 The [`createMongooseFindWithinReferencePlugin`](command:_github.copilot.openSymbolInFile?%5B%22src%2Findex.ts%22%2C%22createMongooseFindWithinReferencePlugin%22%5D "src/index.ts") function accepts an options object with the following properties:
