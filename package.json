@@ -1,6 +1,6 @@
 {
   "name": "mongoose-find-within-ref",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "Mongoose plugin that enables nested queries within referenced documents in MongoDB. It's particularly useful for finding documents based on the properties of their referenced documents",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
