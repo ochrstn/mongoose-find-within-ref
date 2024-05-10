@@ -110,7 +110,7 @@ The [`createMongooseFindWithinReferencePlugin`](command:_github.copilot.openSymb
 
 - [`isActiveByDefault`](command:_github.copilot.openSymbolInFile?%5B%22src%2Findex.ts%22%2C%22isActiveByDefault%22%5D "src/index.ts"): A boolean that determines whether the plugin is active by default for all queries. If set to `false`, you can still activate the plugin for individual queries by setting the [`useFindWithinReference`](command:_github.copilot.openSymbolInFile?%5B%22src%2Findex.ts%22%2C%22useFindWithinReference%22%5D "src/index.ts") option to `true` in the query options.
 
-- [`middlewares`] By default the plugin will use the `pre` middleware to intercept the `find`, `findOne`, `distinct`, `count` and `countDocumets` methods. If you want to use a different middlewares, you can pass them as an array of strings (see [Mongoose middleware](https://mongoosejs.com/docs/middleware.html)).
+- [`middlewares`] By default the plugin will use the `pre` middleware to intercept the `find`, `findOne`, `distinct`, `count` and `countDocuments` methods. If you want to use a different middlewares, you can pass them as an array of strings (see [Mongoose middleware](https://mongoosejs.com/docs/middleware.html)).
 
 ## How It Works
 

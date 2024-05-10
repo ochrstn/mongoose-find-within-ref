@@ -26,7 +26,7 @@ const defaultMiddlewares: MongooseDefaultQueryMiddleware[] = [
   "findOne",
   "distinct",
   "count",
-  "countDocumets",
+  "countDocuments",
 ] as MongooseDefaultQueryMiddleware[];
 
 async function handleQueryKey(
