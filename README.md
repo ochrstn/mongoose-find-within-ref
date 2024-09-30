@@ -116,6 +116,27 @@ Author.find({
 });
 ```
 
+The `&`-syntax is a special feature that allows you to treat non-array fields as arrays in your queries. This is particularly useful when you want to perform an `$in` subquery instead of a `findOne` operation. By prefixing a key with `&`, the system will handle the field as if it were an array, even if it is not defined as such in the schema.
+
+In the following example we want to find all books where the publisher is either female or diverse. The `publisher` field is not an array so without the prefix we would look for a single publisher object that matches the query which would not resolve to the desired result in this case.
+
+```typescript
+Books.find({
+  $or: [
+    {
+      "&publisher": {
+        gender: "w",
+      },
+    },
+    {
+      "&publisher": {
+        gender: "d",
+      },
+    },
+  ],
+});
+```
+
 ### Options
 
 The [`createMongooseFindWithinReferencePlugin`](command:_github.copilot.openSymbolInFile?%5B%22src%2Findex.ts%22%2C%22createMongooseFindWithinReferencePlugin%22%5D "src/index.ts") function accepts an options object with the following properties:

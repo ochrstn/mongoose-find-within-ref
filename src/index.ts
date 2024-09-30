@@ -43,7 +43,15 @@ async function handleQueryKey(
   const isDotSyntax: boolean = key.includes(".");
 
   // if the key is in dot syntax, 1. get the first part of the key
-  const firstPartOfKey = isDotSyntax ? key.split(".")[0] : key;
+  let firstPartOfKey = isDotSyntax ? key.split(".")[0] : key;
+
+  // check if we should treat the field as an array
+  const treatAsArray: boolean = key.startsWith("&");
+
+  // remove the & from the key
+  if (treatAsArray) {
+    firstPartOfKey = firstPartOfKey.substring(1);
+  }
 
   // if the key is in dot syntax, get the remaining part of the key
   const remainingPartOfKey = isDotSyntax
@@ -55,40 +63,36 @@ async function handleQueryKey(
 
   // if the field exists in the schema
   if (fieldSchema) {
+    let ref = null;
+
     // check if is array
     if (fieldSchema.instance === "Array") {
       // get the reference model name from the schema
-      const ref = fieldSchema.options.type[0].ref;
-      if (ref) {
-        // check if we should handle this query (query operation is something that justifies a subquery)
-        if (shouldWeHandleThis(value)) {
-          // replace the inner query with the ids of the referenced documents, obtained through a subquery
-          if (isDotSyntax) {
-            delete query[key];
-          }
-          query[isDotSyntax ? firstPartOfKey : key] = {
-            $in: (
-              await models[ref].find(
-                isDotSyntax ? { [remainingPartOfKey]: value } : value,
-                { _id: 1 },
-                { useFindWithinReference: true }
-              )
-            ).map((doc) => doc._id),
-          };
-        }
-      }
+      ref = fieldSchema.options.type[0].ref;
     } else {
-      // field is not an array
-      const value = query[key];
       // get the reference model name from the schema
-      const ref = fieldSchema.options.ref;
-      if (ref) {
-        // check if we should handle this query (query operation is something that justifies a subquery)
-        if (shouldWeHandleThis(value)) {
-          if (isDotSyntax) {
-            delete query[key];
-          }
+      ref = fieldSchema.options.ref;
+    }
 
+    if (ref) {
+      if (shouldWeHandleThis(value)) {
+        if (isDotSyntax) {
+          delete query[key];
+        }
+
+        // if array or manually set as array
+        if (fieldSchema.instance === "Array" || treatAsArray) {
+          const innerResult = (
+            await models[ref].find(
+              isDotSyntax ? { [remainingPartOfKey]: value } : value,
+              { _id: 1 },
+              { useFindWithinReference: true }
+            )
+          ).map((doc) => doc._id);
+          query[firstPartOfKey] = {
+            $in: innerResult,
+          };
+        } else {
           const foundDocument = await models[ref].findOne(
             isDotSyntax ? { [remainingPartOfKey]: value } : value,
             { _id: 1 },
@@ -96,10 +100,10 @@ async function handleQueryKey(
           );
 
           if (foundDocument) {
-            query[isDotSyntax ? firstPartOfKey : key] = foundDocument._id;
+            query[firstPartOfKey] = foundDocument._id;
           } else {
             // rewrite the query so that it does not match anything
-            query[isDotSyntax ? firstPartOfKey : key] = { $in: [] };
+            query[firstPartOfKey] = { $in: [] };
           }
         }
       }

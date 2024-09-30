@@ -206,4 +206,40 @@ describe("MongooseFindWithinReference", () => {
       expect(result[1]._id).toEqual(data.author2._id);
     });
   });
+
+  describe(`treat field as array`, () => {
+    it("search for books by female or diverse publishers", async () => {
+      await mongoose.connect(mongoUri);
+
+      const findWithinReferencePlugin = createMongooseFindWithinReferencePlugin(
+        {
+          isActiveByDefault: true,
+        }
+      );
+
+      const { Agent, Publisher, Book, Author } = createExampleSchema(
+        findWithinReferencePlugin
+      );
+
+      const data = await createExampleData({
+        Agent,
+        Publisher,
+        Book,
+        Author,
+      });
+
+      const result = await Book.find({
+        $or: [
+          {
+            "&publisher.gender": "w",
+          },
+          {
+            "&publisher.gender": "d",
+          },
+        ],
+      });
+
+      expect(result).toHaveLength(3);
+    });
+  });
 });

@@ -13,12 +13,15 @@ export async function createExampleData({
 }) {
   const publisher1 = await new Publisher({
     name: "Publisher 1",
+    gender: "m",
   }).save();
   const publisher2 = await new Publisher({
     name: "Publisher 2",
+    gender: "w",
   }).save();
   const publisher3 = await new Publisher({
     name: "Publisher 3",
+    gender: "d",
   }).save();
 
   const book1 = await new Book({

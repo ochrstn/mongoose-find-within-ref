@@ -15,6 +15,10 @@ export function createExampleSchema(plugin: any) {
       type: String,
       required: true,
     },
+    gender: {
+      type: String,
+      required: true,
+    },
   });
 
   const Publisher = mongoose.model("Publisher", publisherSchema);
