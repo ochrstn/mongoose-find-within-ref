@@ -45,14 +45,6 @@ async function handleQueryKey(
   // if the key is in dot syntax, 1. get the first part of the key
   let firstPartOfKey = isDotSyntax ? key.split(".")[0] : key;
 
-  // check if we should treat the field as an array
-  const treatAsArray: boolean = key.startsWith("&");
-
-  // remove the & from the key
-  if (treatAsArray) {
-    firstPartOfKey = firstPartOfKey.substring(1);
-  }
-
   // if the key is in dot syntax, get the remaining part of the key
   const remainingPartOfKey = isDotSyntax
     ? key.split(".").slice(1).join(".")
@@ -74,39 +66,21 @@ async function handleQueryKey(
       ref = fieldSchema.options.ref;
     }
 
-    if (ref) {
-      if (shouldWeHandleThis(value)) {
-        if (isDotSyntax) {
-          delete query[key];
-        }
-
-        // if array or manually set as array
-        if (fieldSchema.instance === "Array" || treatAsArray) {
-          const innerResult = (
-            await models[ref].find(
-              isDotSyntax ? { [remainingPartOfKey]: value } : value,
-              { _id: 1 },
-              { useFindWithinReference: true }
-            )
-          ).map((doc) => doc._id);
-          query[firstPartOfKey] = {
-            $in: innerResult,
-          };
-        } else {
-          const foundDocument = await models[ref].findOne(
-            isDotSyntax ? { [remainingPartOfKey]: value } : value,
-            { _id: 1 },
-            { useFindWithinReference: true }
-          );
-
-          if (foundDocument) {
-            query[firstPartOfKey] = foundDocument._id;
-          } else {
-            // rewrite the query so that it does not match anything
-            query[firstPartOfKey] = { $in: [] };
-          }
-        }
+    if (ref && shouldWeHandleThis(value)) {
+      if (isDotSyntax) {
+        delete query[key];
       }
+
+      const innerResult = (
+        await models[ref].find(
+          isDotSyntax ? { [remainingPartOfKey]: value } : value,
+          { _id: 1 },
+          { useFindWithinReference: true }
+        )
+      ).map((doc) => doc._id);
+      query[firstPartOfKey] = {
+        $in: innerResult,
+      };
     }
   }
 }
